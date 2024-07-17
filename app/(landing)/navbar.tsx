@@ -1,5 +1,7 @@
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 const Navbar = () => {
   return (
@@ -14,7 +16,16 @@ const Navbar = () => {
         />
         <h1 className="font-semibold text-lg">TimeSave</h1>
       </div>
-      <Button className="font-bold">Login</Button>
+      <Link
+        href="/sign-in"
+        className={cn(
+          buttonVariants({
+            className: "font-bold",
+          })
+        )}
+      >
+        Login
+      </Link>
     </nav>
   );
 };

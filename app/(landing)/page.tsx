@@ -1,7 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import Image from "next/image";
+import Link from "next/link";
 
 const Features = [
   {
@@ -66,15 +68,24 @@ const LandingPage = () => {
         ))}
       </div>
       <div className="flex flex-col gap-y-2 items-center">
-        <Button size="xl">Start TimeSaving</Button>
+        <Link
+          href="/dashboard"
+          className={cn(
+            buttonVariants({
+              size: "xl",
+            })
+          )}
+        >
+          Start TimeSaving
+        </Link>
         <p className="text-sm text-neutral-500">No Credit Card Required</p>
       </div>
       <div className="max-w-[1000px] w-full p-[10px] bg-gray-200 h-[400px] sm:h-[700px] rounded-xl drop-shadow-xl">
         <Image
           src="/showcase.png"
           alt="showcase-image"
-          width={500}
-          height={500}
+          width={1000}
+          height={1000}
           className="w-full h-full rounded-md"
         />
       </div>
@@ -98,7 +109,7 @@ const LandingPage = () => {
         </Card>
         <Card className="w-full sm:w-[350px] border-4 border-green-400 rounded-md drop-shadow-xl">
           <CardContent className="flex flex-col gap-y-4 p-4 text-green-500 bg-green-100">
-            <h1 className="text-2xl font-bold">Without TimeSave 😭</h1>
+            <h1 className="text-2xl font-bold">With TimeSave 😁</h1>
             {WithoutTimeSave.map((feature, index) => (
               <div
                 key={index}
