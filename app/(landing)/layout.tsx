@@ -1,14 +1,7 @@
 import DotPattern from "@/components/magic-ui/grid-pattern";
 import Navbar from "./navbar";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 
 const LandingLayout = ({ children }: { children: React.ReactNode }) => {
-  const { userId } = auth();
-  if (userId) {
-    return redirect("/dashboard");
-  }
-
   return (
     <div className="flex flex-col w-full h-full">
       <Navbar />

@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
@@ -69,7 +69,7 @@ const LandingPage = () => {
       </div>
       <div className="flex flex-col gap-y-2 items-center">
         <Link
-          href="/dashboard"
+          href="/dashboard/today"
           className={cn(
             buttonVariants({
               size: "xl",
