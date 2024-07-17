@@ -69,7 +69,7 @@ const LandingPage = () => {
       </div>
       <div className="flex flex-col gap-y-2 items-center">
         <Link
-          href="/dashboard/today"
+          href="/today"
           className={cn(
             buttonVariants({
               size: "xl",
