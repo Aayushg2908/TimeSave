@@ -76,7 +76,7 @@ body,
 
 @layer components {
   ::selection {
-    @apply bg-green-500 text-green-100;
+    @apply bg-green-500 text-green-50;
   }
 }
 
