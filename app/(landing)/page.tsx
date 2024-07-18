@@ -1,51 +1,10 @@
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Features, WithTimeSave, WithoutTimeSave } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import Link from "next/link";
-
-const Features = [
-  {
-    title: "Plan deep work sessions",
-  },
-  {
-    title: "Adopt a maker's schedule",
-  },
-  {
-    title: "Eliminate decision fatigue",
-  },
-];
-
-const WithoutTimeSave = [
-  {
-    title: "Calendar + email rule your day",
-  },
-  {
-    title: "Constant distractions",
-  },
-  {
-    title: "Work feels neverending",
-  },
-  {
-    title: "Hard tasks get interrupted",
-  },
-];
-
-const WithTimeSave = [
-  {
-    title: "You plan out your optimal day",
-  },
-  {
-    title: "Avoid context switching",
-  },
-  {
-    title: "Defined start and end of work",
-  },
-  {
-    title: "Hard tasks get dedicated time",
-  },
-];
 
 const LandingPage = () => {
   return (
@@ -110,7 +69,7 @@ const LandingPage = () => {
         <Card className="w-full sm:w-[350px] border-4 border-green-400 rounded-md drop-shadow-xl">
           <CardContent className="flex flex-col gap-y-4 p-4 text-green-500 bg-green-100">
             <h1 className="text-2xl font-bold">With TimeSave 😁</h1>
-            {WithoutTimeSave.map((feature, index) => (
+            {WithTimeSave.map((feature, index) => (
               <div
                 key={index}
                 className="flex items-center gap-x-3 text-lg tracking-tight font-semibold"
