@@ -31,7 +31,8 @@ const UserDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem className="cursor-pointer">
-          <Gem className="size-5 mr-2" /> Upgrade
+          <Gem className="size-5 mr-2 text-green-500" />
+          <span className="text-green-500">Upgrade</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -40,7 +41,8 @@ const UserDropdown = () => {
           }}
           className="cursor-pointer"
         >
-          <LogOutIcon className="size-5 mr-2" /> Logout
+          <LogOutIcon className="size-5 mr-2 text-red-500" />
+          <span className="text-red-500">Log Out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
