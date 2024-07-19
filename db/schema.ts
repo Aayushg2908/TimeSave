@@ -5,8 +5,11 @@ import {
   text,
   primaryKey,
   integer,
+  date,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
+import { createSelectSchema } from "drizzle-zod";
+import { InferSelectModel } from "drizzle-orm";
 
 export const users = pgTable("user", {
   id: text("id")
@@ -85,3 +88,16 @@ export const authenticators = pgTable(
     }),
   })
 );
+
+export const userNotes = pgTable("userNote", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  date: text("date").notNull(),
+});
+
+export type UserNote = InferSelectModel<typeof userNotes>;
