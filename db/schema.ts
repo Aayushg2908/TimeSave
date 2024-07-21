@@ -101,3 +101,20 @@ export const userNotes = pgTable("userNote", {
 });
 
 export type UserNote = InferSelectModel<typeof userNotes>;
+
+export const userTodos = pgTable("userTodo", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  tag: text("tag"),
+  completed: boolean("completed")
+    .notNull()
+    .$default(() => false),
+  date: text("date").notNull(),
+});
+
+export type UserTodo = InferSelectModel<typeof userTodos>;

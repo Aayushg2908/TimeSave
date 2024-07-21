@@ -1,13 +1,14 @@
-import { getNotes } from "@/actions/main";
+import { getNotes, getTodos } from "@/actions/main";
 import Notes from "./notes";
 import Todo from "./todo";
 
 const MainPage = async ({ params }: { params: { date: string } }) => {
   const userNote = await getNotes(params.date);
+  const userTodos = await getTodos(params.date);
 
   return (
     <div className="w-full h-full grid grid-cols-1 sm:grid-cols-3">
-      <Todo />
+      <Todo userTodos={userTodos} />
       <div className="h-full border-r">CALENDAR</div>
       <Notes userNote={userNote} />
     </div>
