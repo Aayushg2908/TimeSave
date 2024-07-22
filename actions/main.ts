@@ -129,7 +129,7 @@ export const saveTodo = async ({
   id: string;
   values: {
     content?: string;
-    tag?: string;
+    tag?: string | null;
     completed?: boolean;
   };
   pathname: string;
@@ -142,6 +142,19 @@ export const saveTodo = async ({
   await db
     .update(userTodos)
     .set({ ...values })
+    .where(and(eq(userTodos.userId, session.user.id!), eq(userTodos.id, id)));
+
+  revalidatePath(pathname);
+};
+
+export const deleteTodo = async (id: string, pathname: string) => {
+  const session = await auth();
+  if (!session || !session?.user || !session.user?.id) {
+    return redirect("/sign-in");
+  }
+
+  await db
+    .delete(userTodos)
     .where(and(eq(userTodos.userId, session.user.id!), eq(userTodos.id, id)));
 
   revalidatePath(pathname);

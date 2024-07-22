@@ -1,16 +1,35 @@
 "use client";
 
-import { createTodo, saveTodo } from "@/actions/main";
+import { createTodo, deleteTodo, saveTodo } from "@/actions/main";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserTodo } from "@/db/schema";
 import { CheckedState } from "@radix-ui/react-checkbox";
-import { Ellipsis, ListTodoIcon } from "lucide-react";
+import {
+  Activity,
+  CircleCheckBig,
+  CopyIcon,
+  Ellipsis,
+  ListTodoIcon,
+  TagIcon,
+  Trash2,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 const Todo = ({ userTodos }: { userTodos: UserTodo[] }) => {
   const [todo, setTodo] = useState("");
@@ -19,6 +38,11 @@ const Todo = ({ userTodos }: { userTodos: UserTodo[] }) => {
   const pathname = usePathname();
   const [contentEditing, setContentEditing] = useState("");
   const [newContent, setNewContent] = useState("");
+  const [tagEditing, setTagEditing] = useState("");
+  const [newTag, setNewTag] = useState("");
+  const [loadingTag, setLoadingTag] = useState(false);
+  const [todoTag, setTodoTag] = useState("");
+  const [todoTagLoading, setTodoTagLoading] = useState(false);
 
   const handleAddTodo = async (e: any) => {
     e.preventDefault();
@@ -86,6 +110,26 @@ const Todo = ({ userTodos }: { userTodos: UserTodo[] }) => {
     }
   };
 
+  const handleTodoTag = async (e: any) => {
+    e.preventDefault();
+    try {
+      setLoadingTag(true);
+      await saveTodo({
+        id: tagEditing,
+        values: {
+          tag: newTag ? newTag : null,
+        },
+        pathname,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setTagEditing("");
+      setNewTag("");
+      setLoadingTag(false);
+    }
+  };
+
   return (
     <ScrollArea className="w-full h-full border-r">
       <div className="h-full p-2">
@@ -147,8 +191,147 @@ const Todo = ({ userTodos }: { userTodos: UserTodo[] }) => {
                 )}
               </div>
               <div className="flex items-center gap-x-4">
-                {todo.tag && <Badge>{todo.tag}</Badge>}
-                <Ellipsis className="size-5" />
+                {todo.tag && (
+                  <>
+                    {tagEditing === todo.id ? (
+                      <Badge>
+                        <form onSubmit={handleTodoTag}>
+                          <Input
+                            disabled={loadingTag}
+                            autoFocus
+                            value={newTag}
+                            onChange={(e) => setNewTag(e.target.value)}
+                            className="max-w-[60px] w-fit h-fit p-0 border-none focus-visible:ring-0 text-xs"
+                          />
+                          <Button type="submit" className="hidden">
+                            Save
+                          </Button>
+                        </form>
+                      </Badge>
+                    ) : (
+                      <Badge
+                        onClick={() => {
+                          setTagEditing(todo.id);
+                          setNewTag(todo.tag!);
+                        }}
+                        className="max-w-[100px] line-clamp-1"
+                      >
+                        {todo.tag}
+                      </Badge>
+                    )}
+                  </>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Ellipsis className="size-5 text-slate-500" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="space-y-1">
+                    {todo.completed ? (
+                      <DropdownMenuItem
+                        onSelect={async () => {
+                          await saveTodo({
+                            id: todo.id,
+                            values: {
+                              completed: false,
+                            },
+                            pathname,
+                          });
+                        }}
+                        className="cursor-pointer flex items-center gap-x-2"
+                      >
+                        <Activity className="size-4" /> Mark as Active
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        onSelect={async () => {
+                          await saveTodo({
+                            id: todo.id,
+                            values: {
+                              completed: true,
+                            },
+                            pathname,
+                          });
+                        }}
+                        className="cursor-pointer flex items-center gap-x-2"
+                      >
+                        <CircleCheckBig className="size-4" /> Mark as Done
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        navigator.clipboard.writeText(todo.content);
+                        toast.success("Title copied to clipboard");
+                      }}
+                      className="cursor-pointer flex items-center gap-x-2"
+                    >
+                      <CopyIcon className="size-4" /> Copy Title
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    {todo.tag ? (
+                      <DropdownMenuItem
+                        onSelect={async () => {
+                          await saveTodo({
+                            id: todo.id,
+                            values: {
+                              tag: null,
+                            },
+                            pathname,
+                          });
+                        }}
+                        className="cursor-pointer flex items-center gap-x-2"
+                      >
+                        <TagIcon className="size-4" /> Remove Tag
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="cursor-pointer flex items-center gap-x-2">
+                          <TagIcon className="size-4" /> Add Tag
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          <form
+                            onSubmit={async (e) => {
+                              e.preventDefault();
+                              try {
+                                setTodoTagLoading(true);
+                                await saveTodo({
+                                  id: todo.id,
+                                  values: {
+                                    tag: todoTag,
+                                  },
+                                  pathname,
+                                });
+                              } catch (error) {
+                                console.log(error);
+                              } finally {
+                                setTodoTagLoading(false);
+                              }
+                            }}
+                          >
+                            <Input
+                              disabled={todoTagLoading}
+                              value={todoTag}
+                              onChange={(e) => setTodoTag(e.target.value)}
+                              placeholder="Add a to-do"
+                            />
+                            <Button type="submit" className="hidden">
+                              Save
+                            </Button>
+                          </form>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={async () => {
+                        await deleteTodo(todo.id, pathname);
+                        toast.success("To-do deleted successfully");
+                      }}
+                      className="cursor-pointer flex items-center gap-x-2 text-red-500 hover:!text-red-500"
+                    >
+                      <Trash2 className="size-4" /> Delete to-do
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           ))}
