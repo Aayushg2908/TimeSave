@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/db/drizzle";
 import { userNotes, userTodos } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -90,11 +90,23 @@ export const createTodo = async ({
     return redirect("/sign-in");
   }
 
+  const query = await db
+    .select()
+    .from(userTodos)
+    .where(
+      and(eq(userTodos.userId, session.user.id!), eq(userTodos.date, date))
+    )
+    .orderBy(desc(userTodos.order))
+    .limit(1);
+  const lastTodo = query[0];
+  const newOrder = lastTodo ? lastTodo.order + 1 : 0;
+
   await db.insert(userTodos).values({
     userId: session.user.id!,
     content: content,
     date: date,
     tag: tag,
+    order: newOrder,
   });
 
   revalidatePath(pathname);
@@ -116,7 +128,7 @@ export const getTodos = async (date: string) => {
     .where(
       and(eq(userTodos.userId, session.user.id!), eq(userTodos.date, date))
     )
-    .orderBy(userTodos.createdAt);
+    .orderBy(userTodos.order);
 
   return query;
 };
@@ -131,6 +143,7 @@ export const saveTodo = async ({
     content?: string;
     tag?: string | null;
     completed?: boolean;
+    order?: number;
   };
   pathname: string;
 }) => {

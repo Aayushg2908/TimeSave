@@ -1,1 +1,0 @@
-ALTER TABLE "userNote" ALTER COLUMN "date" SET DATA TYPE text;
