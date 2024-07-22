@@ -115,6 +115,7 @@ export const userTodos = pgTable("userTodo", {
     .notNull()
     .$default(() => false),
   date: text("date").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export type UserTodo = InferSelectModel<typeof userTodos>;

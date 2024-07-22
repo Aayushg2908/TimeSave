@@ -30,9 +30,11 @@ export const getNotes = async (date: string) => {
 export const createNote = async ({
   content,
   date,
+  pathname,
 }: {
   content: string;
   date: string;
+  pathname: string;
 }) => {
   const session = await auth();
   if (!session || !session?.user || !session.user?.id) {
@@ -45,15 +47,17 @@ export const createNote = async ({
     date: date,
   });
 
-  revalidatePath("/today");
+  revalidatePath(pathname);
 };
 
 export const saveNote = async ({
   content,
   date,
+  pathname,
 }: {
   content: string;
   date: string;
+  pathname: string;
 }) => {
   const session = await auth();
   if (!session || !session?.user || !session.user?.id) {
@@ -67,17 +71,19 @@ export const saveNote = async ({
       and(eq(userNotes.userId, session.user.id!), eq(userNotes.date, date))
     );
 
-  revalidatePath("/today");
+  revalidatePath(pathname);
 };
 
 export const createTodo = async ({
   content,
   date,
   tag,
+  pathname,
 }: {
   content: string;
   date: string;
   tag?: string;
+  pathname: string;
 }) => {
   const session = await auth();
   if (!session || !session?.user || !session.user?.id) {
@@ -91,7 +97,7 @@ export const createTodo = async ({
     tag: tag,
   });
 
-  revalidatePath("/today");
+  revalidatePath(pathname);
 };
 
 export const getTodos = async (date: string) => {
@@ -109,7 +115,34 @@ export const getTodos = async (date: string) => {
     .from(userTodos)
     .where(
       and(eq(userTodos.userId, session.user.id!), eq(userTodos.date, date))
-    );
+    )
+    .orderBy(userTodos.createdAt);
 
   return query;
+};
+
+export const saveTodo = async ({
+  id,
+  values,
+  pathname,
+}: {
+  id: string;
+  values: {
+    content?: string;
+    tag?: string;
+    completed?: boolean;
+  };
+  pathname: string;
+}) => {
+  const session = await auth();
+  if (!session || !session?.user || !session.user?.id) {
+    return redirect("/sign-in");
+  }
+
+  await db
+    .update(userTodos)
+    .set({ ...values })
+    .where(and(eq(userTodos.userId, session.user.id!), eq(userTodos.id, id)));
+
+  revalidatePath(pathname);
 };

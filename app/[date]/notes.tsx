@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserNote } from "@/db/schema";
 import { Loader2, NotebookPen } from "lucide-react";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
@@ -13,6 +14,7 @@ const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
 const Notes = ({ userNote }: { userNote: UserNote }) => {
   const [note, setNote] = useState(userNote ? userNote.content : "");
   const [loading, setLoading] = useState(false);
+  const pathname = usePathname();
 
   const saveNote = async () => {
     try {
@@ -21,11 +23,13 @@ const Notes = ({ userNote }: { userNote: UserNote }) => {
         await createNote({
           content: note,
           date: new Date().toISOString().split("T")[0],
+          pathname: pathname,
         });
       } else {
         await saveUserNote({
           content: note,
           date: userNote.date,
+          pathname: pathname,
         });
       }
     } catch (error) {
