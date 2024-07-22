@@ -34,6 +34,7 @@ const CalendarDropdown = () => {
           mode="single"
           selected={new Date()}
           onSelect={(date) => {
+            date?.setHours(date.getHours() + 24);
             router.push(`/${date?.toISOString().split("T")[0]}`);
           }}
         />
