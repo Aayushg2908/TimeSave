@@ -8,7 +8,7 @@ const MainPage = async ({ params }: { params: { date: string } }) => {
 
   return (
     <div className="w-full h-full grid grid-cols-1 sm:grid-cols-3">
-      <Todo userTodos={userTodos} />
+      <Todo userTodos={userTodos} date={params.date} />
       <div className="h-full border-r">CALENDAR</div>
       <Notes userNote={userNote} />
     </div>

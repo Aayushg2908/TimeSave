@@ -32,7 +32,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 
-const Todo = ({ userTodos }: { userTodos: UserTodo[] }) => {
+const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
   const [todo, setTodo] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -60,7 +60,7 @@ const Todo = ({ userTodos }: { userTodos: UserTodo[] }) => {
 
       await createTodo({
         content: finalContent || todo,
-        date: new Date().toISOString().split("T")[0],
+        date: date === "today" ? new Date().toISOString().split("T")[0] : date,
         tag: tag,
         pathname: pathname,
       });
