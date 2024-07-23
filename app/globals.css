@@ -88,3 +88,70 @@ body,
     scrollbar-width: none;
   }
 }
+
+.rbc-time-header-content {
+  display: none !important;
+}
+
+.rbc-time-content>.rbc-time-gutter {
+  flex: none !important;
+}
+
+.rbc-time-view .rbc-time-gutter {
+  white-space: nowrap !important;
+  text-align: right !important;
+}
+
+.rbc-time-column {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100% !important;
+}
+
+.rbc-time-column .rbc-timeslot-group {
+  flex: 1 !important;
+}
+
+.rbc-timeslot-group {
+  border-bottom-color: #ddd !important;
+  border-bottom-width: 1px !important;
+  border-bottom-style: solid !important;
+  min-height: 80px !important;
+  display: flex !important;
+  flex-flow: column nowrap !important;
+}
+
+.rbc-time-gutter {
+  font-size: 11px !important;
+  font-family: Inter, sans-serif !important;
+  border-right: 1px solid #cfcfcf3a !important;
+  color: #7d7f7dcd !important;
+}
+
+.rbc-time-view, .rbc-timeslot-group {
+  border: none !important;
+}
+
+.rbc-time-slot {
+  background: #fff !important;
+  min-height: 48px !important;
+  min-width: 42.5px !important;
+}
+
+.rbc-label {
+  padding: 0 5px !important;
+  margin-right: 6px !important;
+}
+
+.rbc-current-time-indicator {
+  position: absolute !important;
+  z-index: 5 !important;
+  background-color: #3fdb97 !important;
+  height: 1px !important;
+  border: 1px dashed #3fdb97;
+  pointer-events: none !important;
+}
+
+.rbc-event {
+  background-color: #07a71c !important;
+}
