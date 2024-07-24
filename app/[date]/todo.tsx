@@ -284,7 +284,11 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
                                 setContentEditing(todo.id);
                                 setNewContent(todo.content);
                               }}
-                              className={todo.completed ? "line-through" : ""}
+                              className={
+                                todo.completed
+                                  ? "line-through line-clamp-1"
+                                  : "line-clamp-1"
+                              }
                             >
                               {todo.content}
                             </span>

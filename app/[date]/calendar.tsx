@@ -14,11 +14,11 @@ import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import { useEffect, useState } from "react";
+import { saveTodo } from "@/actions/main";
+import { usePathname } from "next/navigation";
 
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { saveTodo } from "@/actions/main";
-import { usePathname } from "next/navigation";
 
 const locales = {
   "en-US": enUS,
