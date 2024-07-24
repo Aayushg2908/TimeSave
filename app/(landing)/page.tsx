@@ -43,7 +43,7 @@ const LandingPage = () => {
         <Image
           src="/showcase.png"
           alt="showcase-image"
-          width={1000}
+          width={1500}
           height={1000}
           className="w-full h-full rounded-md"
         />
