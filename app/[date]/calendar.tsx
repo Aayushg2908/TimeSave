@@ -17,6 +17,8 @@ import { useEffect, useState } from "react";
 
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { saveTodo } from "@/actions/main";
+import { usePathname } from "next/navigation";
 
 const locales = {
   "en-US": enUS,
@@ -31,9 +33,9 @@ const localizer = dateFnsLocalizer({
 
 const DnDCalendar = withDragAndDrop(RBCalendar);
 
-const Calendar = () => {
+const Calendar = ({ calendarEvents }: { calendarEvents: Event[] }) => {
   const [isMounted, setIsMounted] = useState(false);
-  const [events, setEvents] = useState<Event[]>([]);
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsMounted(true);
@@ -50,37 +52,43 @@ const Calendar = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const onEventResize: withDragAndDropProps["onEventResize"] = (data) => {
+  const onEventResize: withDragAndDropProps["onEventResize"] = async (data) => {
     const { start, end, event } = data;
 
-    setEvents((currentEvents) => {
-      return currentEvents.map((evt) => {
-        if (evt.resource === event.resource) {
-          return {
-            ...evt,
-            start: new Date(start),
-            end: new Date(end),
-          };
-        }
-        return evt;
-      });
+    calendarEvents.map((calendarEvent) => {
+      if (calendarEvent.resource === event.resource) {
+        calendarEvent.start = new Date(start);
+        calendarEvent.end = new Date(end);
+      }
+    });
+
+    await saveTodo({
+      id: event.resource,
+      values: {
+        start: new Date(start),
+        end: new Date(end),
+      },
+      pathname,
     });
   };
 
-  const onEventDrop: withDragAndDropProps["onEventDrop"] = (data) => {
+  const onEventDrop: withDragAndDropProps["onEventDrop"] = async (data) => {
     const { start, end, event } = data;
 
-    setEvents((currentEvents) => {
-      return currentEvents.map((evt) => {
-        if (evt.resource === event.resource) {
-          return {
-            ...evt,
-            start: new Date(start),
-            end: new Date(end),
-          };
-        }
-        return evt;
-      });
+    calendarEvents.map((calendarEvent) => {
+      if (calendarEvent.resource === event.resource) {
+        calendarEvent.start = new Date(start);
+        calendarEvent.end = new Date(end);
+      }
+    });
+
+    await saveTodo({
+      id: event.resource,
+      values: {
+        start: new Date(start),
+        end: new Date(end),
+      },
+      pathname,
     });
   };
 
@@ -92,7 +100,7 @@ const Calendar = () => {
     <div className="h-full border-r">
       <DnDCalendar
         defaultView="day"
-        events={events}
+        events={calendarEvents}
         localizer={localizer}
         onEventDrop={onEventDrop}
         onEventResize={onEventResize}

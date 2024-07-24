@@ -6,12 +6,14 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const CalendarDropdown = () => {
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+  const params = useParams();
+  const date = params.date as string;
 
   useEffect(() => {
     setIsMounted(true);
@@ -23,10 +25,15 @@ const CalendarDropdown = () => {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <span className="font-semibold">
-          {new Date().toLocaleDateString(undefined, {
-            month: "long",
-            day: "numeric",
-          })}
+          {date !== "today"
+            ? new Date(date).toLocaleDateString(undefined, {
+                month: "long",
+                day: "numeric",
+              })
+            : new Date().toLocaleDateString(undefined, {
+                month: "long",
+                day: "numeric",
+              })}
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
