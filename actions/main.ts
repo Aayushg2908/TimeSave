@@ -144,6 +144,8 @@ export const saveTodo = async ({
     tag?: string | null;
     completed?: boolean;
     order?: number;
+    start?: Date | null;
+    end?: Date | null;
   };
   pathname: string;
 }) => {

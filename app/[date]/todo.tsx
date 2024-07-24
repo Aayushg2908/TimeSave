@@ -20,6 +20,7 @@ import { UserTodo } from "@/db/schema";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import {
   Activity,
+  CalendarIcon,
   CircleCheckBig,
   CopyIcon,
   Ellipsis,
@@ -28,11 +29,14 @@ import {
   Trash2,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import addHours from "date-fns/addHours";
+import startOfHour from "date-fns/startOfHour";
 
 const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
+  const [isMounted, setIsMounted] = useState(false);
   const [todo, setTodo] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -44,6 +48,10 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
   const [loadingTag, setLoadingTag] = useState(false);
   const [todoTag, setTodoTag] = useState("");
   const [todoTagLoading, setTodoTagLoading] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleAddTodo = async (e: any) => {
     e.preventDefault();
@@ -135,7 +143,6 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
     const { destination, source, type } = result;
 
     if (!destination) {
-      console.log("No destination");
       return;
     }
 
@@ -143,7 +150,6 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
-      console.log("Same position");
       return;
     }
 
@@ -174,6 +180,43 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
       }
     }
   };
+
+  const handleAddToCalendar = async (id: string, type: "ADD" | "REMOVE") => {
+    try {
+      toast.loading("Please wait...");
+      if (type === "ADD") {
+        // @ts-ignore
+        const endOfHour = (date: Date): Date => addHours(startOfHour(date), 1);
+        const now = new Date();
+        const start = endOfHour(now);
+        // @ts-ignore
+        const end = addHours(start, 1);
+        await saveTodo({
+          id,
+          values: {
+            start,
+            end,
+          },
+          pathname,
+        });
+      } else {
+        await saveTodo({
+          id,
+          values: {
+            start: null,
+            end: null,
+          },
+          pathname,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      toast.dismiss();
+    }
+  };
+
+  if (!isMounted) return null;
 
   return (
     <ScrollArea className="w-full h-full border-r">
@@ -247,7 +290,7 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-x-4">
+                        <div className="flex items-center gap-x-3">
                           {todo.tag && (
                             <>
                               {tagEditing === todo.id ? (
@@ -279,6 +322,11 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
                                 </Badge>
                               )}
                             </>
+                          )}
+                          {todo.start && (
+                            <Badge className="max-w-[100px] line-clamp-1">
+                              {todo.start.toLocaleTimeString()}
+                            </Badge>
                           )}
                           <DropdownMenu>
                             <DropdownMenuTrigger>
@@ -326,6 +374,27 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
                               >
                                 <CopyIcon className="size-4" /> Copy Title
                               </DropdownMenuItem>
+                              {todo.start ? (
+                                <DropdownMenuItem
+                                  onSelect={async () =>
+                                    await handleAddToCalendar(todo.id, "REMOVE")
+                                  }
+                                  className="cursor-pointer flex items-center gap-x-2"
+                                >
+                                  <CalendarIcon className="size-4" /> Remove
+                                  From Calendar
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onSelect={async () =>
+                                    await handleAddToCalendar(todo.id, "ADD")
+                                  }
+                                  className="cursor-pointer flex items-center gap-x-2"
+                                >
+                                  <CalendarIcon className="size-4" /> Add To
+                                  Calendar
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuSeparator />
                               {todo.tag ? (
                                 <DropdownMenuItem

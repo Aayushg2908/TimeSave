@@ -5,10 +5,8 @@ import {
   text,
   primaryKey,
   integer,
-  date,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
-import { createSelectSchema } from "drizzle-zod";
 import { InferSelectModel } from "drizzle-orm";
 
 export const users = pgTable("user", {
@@ -118,6 +116,8 @@ export const userTodos = pgTable("userTodo", {
   order: integer("order")
     .notNull()
     .$default(() => 0),
+  start: timestamp("start", { mode: "date" }),
+  end: timestamp("end", { mode: "date" }),
 });
 
 export type UserTodo = InferSelectModel<typeof userTodos>;
