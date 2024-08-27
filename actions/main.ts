@@ -2,7 +2,8 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db/drizzle";
-import { userNotes, userTodos } from "@/db/schema";
+import { userNotes, userSubscription, userTodos } from "@/db/schema";
+import { stripe } from "@/lib/stripe";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -173,4 +174,56 @@ export const deleteTodo = async (id: string, pathname: string) => {
     .where(and(eq(userTodos.userId, session.user.id!), eq(userTodos.id, id)));
 
   revalidatePath(pathname);
+};
+
+export const upgradeToPro = async () => {
+  const session = await auth();
+  if (!session || !session?.user || !session.user?.id) {
+    return redirect("/sign-in");
+  }
+
+  const query = await db
+    .select()
+    .from(userSubscription)
+    .where(eq(userSubscription.userId, session.user.id!));
+  const subscription = query[0];
+
+  if (subscription && subscription.stripeCustomerId) {
+    const stripeSession = await stripe.billingPortal.sessions.create({
+      customer: subscription.stripeCustomerId,
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/today`,
+    });
+
+    return { url: stripeSession.url };
+  }
+
+  const stripeSession = await stripe.checkout.sessions.create({
+    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/today`,
+    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/today`,
+    payment_method_types: ["card"],
+    mode: "subscription",
+    billing_address_collection: "auto",
+    customer_email: session.user.email!,
+    line_items: [
+      {
+        price_data: {
+          currency: "USD",
+          product_data: {
+            name: "Time Save",
+            description: "Your daily productivity companion",
+          },
+          unit_amount: 1000,
+          recurring: {
+            interval: "month",
+          },
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      userId: session.user.id,
+    },
+  });
+
+  return { url: stripeSession.url };
 };

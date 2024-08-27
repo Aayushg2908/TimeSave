@@ -121,3 +121,18 @@ export const userTodos = pgTable("userTodo", {
 });
 
 export type UserTodo = InferSelectModel<typeof userTodos>;
+
+export const userSubscription = pgTable("userSubscription", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  stripeCustomerId: text("stripeCustomerId"),
+  stripeSubscriptionId: text("stripeSubscriptionId"),
+  stripePriceId: text("stripePriceId"),
+  stripeCurrentPeriodEnd: timestamp("stripeCurrentPeriodEnd", {
+    mode: "date",
+  }),
+});

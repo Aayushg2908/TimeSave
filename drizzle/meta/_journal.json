@@ -15,6 +15,13 @@
       "when": 1721805569780,
       "tag": "0001_sudden_pepper_potts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1724767071944,
+      "tag": "0002_massive_ender_wiggin",
+      "breakpoints": true
     }
   ]
 }
