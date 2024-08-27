@@ -198,8 +198,8 @@ export const upgradeToPro = async () => {
   }
 
   const stripeSession = await stripe.checkout.sessions.create({
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/today`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/today`,
+    success_url: "https://time-save.vercel.app/today",
+    cancel_url: "https://time-save.vercel.app/today",
     payment_method_types: ["card"],
     mode: "subscription",
     billing_address_collection: "auto",
