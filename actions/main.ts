@@ -191,7 +191,7 @@ export const upgradeToPro = async () => {
   if (subscription && subscription.stripeCustomerId) {
     const stripeSession = await stripe.billingPortal.sessions.create({
       customer: subscription.stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/today`,
+      return_url: "https://time-save.vercel.app/today",
     });
 
     return { url: stripeSession.url };
