@@ -3,10 +3,12 @@ import Notes from "./notes";
 import Todo from "./todo";
 import Calendar from "./calendar";
 import { Event } from "react-big-calendar";
+import { checkSubscription } from "@/lib/subscription";
 
 const MainPage = async ({ params }: { params: { date: string } }) => {
   const userNote = await getNotes(params.date);
   const userTodos = await getTodos(params.date);
+  const isPro = await checkSubscription();
 
   const calendarEvents: Event[] = userTodos.map((todo) => {
     if (todo.start && todo.end) {
@@ -23,7 +25,7 @@ const MainPage = async ({ params }: { params: { date: string } }) => {
 
   return (
     <div className="w-full h-full grid grid-cols-1 sm:grid-cols-3">
-      <Todo userTodos={userTodos} date={params.date} />
+      <Todo userTodos={userTodos} date={params.date} isPro={isPro} />
       <Calendar calendarEvents={calendarEvents} />
       <Notes userNote={userNote} />
     </div>

@@ -35,7 +35,15 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import addHours from "date-fns/addHours";
 import startOfHour from "date-fns/startOfHour";
 
-const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
+const Todo = ({
+  userTodos,
+  date,
+  isPro,
+}: {
+  userTodos: UserTodo[];
+  date: string;
+  isPro: boolean;
+}) => {
   const [isMounted, setIsMounted] = useState(false);
   const [todo, setTodo] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -183,6 +191,10 @@ const Todo = ({ userTodos, date }: { userTodos: UserTodo[]; date: string }) => {
 
   const handleAddToCalendar = async (id: string, type: "ADD" | "REMOVE") => {
     try {
+      if (!isPro) {
+        toast.error("This feature is only available for Pro users!");
+        return;
+      }
       toast.loading("Please wait...");
       if (type === "ADD") {
         // @ts-ignore
