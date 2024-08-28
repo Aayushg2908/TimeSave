@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/db/drizzle";
 import { userNotes, userSubscription, userTodos } from "@/db/schema";
 import { stripe } from "@/lib/stripe";
+import { checkSubscription } from "@/lib/subscription";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -153,6 +154,11 @@ export const saveTodo = async ({
   const session = await auth();
   if (!session || !session?.user || !session.user?.id) {
     return redirect("/sign-in");
+  }
+
+  const isPro = await checkSubscription();
+  if (!isPro) {
+    return;
   }
 
   await db

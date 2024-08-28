@@ -35,7 +35,7 @@ const UserDropdown = () => {
             alt="user-image"
             width={50}
             height={50}
-            className="size-6"
+            className="size-6 rounded-full"
           />
         ) : (
           <FaUserCircle className="size-6" />
