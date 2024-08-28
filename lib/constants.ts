@@ -1,4 +1,4 @@
-export const publicRoutes = ["/"];
+export const publicRoutes = ["/", "/api/webhook"];
 
 export const authRoutes = ["/sign-in", "/sign-up", "/new-verification"];
 
