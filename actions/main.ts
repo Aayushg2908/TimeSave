@@ -157,7 +157,7 @@ export const saveTodo = async ({
   }
 
   const isPro = await checkSubscription();
-  if (!isPro) {
+  if (!isPro && (values.start || values.end)) {
     return;
   }
 
