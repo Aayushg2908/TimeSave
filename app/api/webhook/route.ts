@@ -25,37 +25,37 @@ export async function POST(req: Request) {
   const session = event.data.object as Stripe.Checkout.Session;
 
   if (event.type === "checkout.session.completed") {
-    const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
-    );
-
     if (!session?.metadata?.userId) {
       return new NextResponse("User id is required", { status: 400 });
     }
 
-    await db.insert(userSubscription).values({
-      userId: session?.metadata?.userId,
-      stripeSubscriptionId: subscription.id,
-      stripeCustomerId: subscription.customer as string,
-      stripePriceId: subscription.items.data[0].price.id,
-      stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    });
-  }
+    const query = await db
+      .select()
+      .from(userSubscription)
+      .where(eq(userSubscription.userId, session?.metadata?.userId));
+    const subscription = query[0];
 
-  if (event.type === "invoice.payment_succeeded") {
-    const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
-    );
-
-    await db
-      .update(userSubscription)
-      .set({
-        stripePriceId: subscription.items.data[0].price.id,
-        stripeCurrentPeriodEnd: new Date(
-          subscription.current_period_end * 1000
-        ),
-      })
-      .where(eq(userSubscription.stripeSubscriptionId, subscription.id));
+    if (!subscription) {
+      await db.insert(userSubscription).values({
+        userId: session?.metadata?.userId,
+        stripeSubscriptionId: session.id,
+        stripeCustomerId: session.customer as string,
+        stripePriceId: session.amount_total
+          ? String(session.amount_total / 100)
+          : null,
+        stripeCurrentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      });
+    } else {
+      await db
+        .update(userSubscription)
+        .set({
+          stripePriceId: session.amount_total?.toString(),
+          stripeCurrentPeriodEnd: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000
+          ),
+        })
+        .where(eq(userSubscription.stripeSubscriptionId, session.id));
+    }
   }
 
   return new NextResponse(null, { status: 200 });

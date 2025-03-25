@@ -14,7 +14,7 @@ import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { upgradeToPro } from "@/actions/main";
 
-const UserDropdown = () => {
+const UserDropdown = ({ isPro }: { isPro: boolean }) => {
   const { data } = useSession();
 
   const handleUpgrade = async () => {
@@ -42,9 +42,18 @@ const UserDropdown = () => {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onSelect={handleUpgrade} className="cursor-pointer">
-          <Gem className="size-5 mr-2 text-green-500" />
-          <span className="text-green-500">Upgrade</span>
+        <DropdownMenuItem
+          onSelect={isPro ? undefined : handleUpgrade}
+          className="cursor-pointer"
+        >
+          {isPro ? (
+            <span className="text-green-500">Already Pro</span>
+          ) : (
+            <>
+              <Gem className="size-5 mr-2 text-green-500" />
+              <span className="text-green-500">Upgrade</span>
+            </>
+          )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

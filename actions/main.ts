@@ -188,26 +188,11 @@ export const upgradeToPro = async () => {
     return redirect("/sign-in");
   }
 
-  const query = await db
-    .select()
-    .from(userSubscription)
-    .where(eq(userSubscription.userId, session.user.id!));
-  const subscription = query[0];
-
-  if (subscription && subscription.stripeCustomerId) {
-    const stripeSession = await stripe.billingPortal.sessions.create({
-      customer: subscription.stripeCustomerId,
-      return_url: "https://time-save.vercel.app/today",
-    });
-
-    return { url: stripeSession.url };
-  }
-
   const stripeSession = await stripe.checkout.sessions.create({
     success_url: "https://time-save.vercel.app/today",
     cancel_url: "https://time-save.vercel.app/today",
     payment_method_types: ["card"],
-    mode: "subscription",
+    mode: "payment",
     billing_address_collection: "auto",
     customer_email: session.user.email!,
     line_items: [
@@ -219,9 +204,6 @@ export const upgradeToPro = async () => {
             description: "Your daily productivity companion",
           },
           unit_amount: 1000,
-          recurring: {
-            interval: "month",
-          },
         },
         quantity: 1,
       },
